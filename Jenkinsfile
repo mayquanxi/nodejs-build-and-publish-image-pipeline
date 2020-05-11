@@ -40,6 +40,11 @@ pipeline {
                   sh 'docker push mayquanxi/nodejs'
                }
             }
+            stage('remove container') {
+               steps {
+                  sh 'docker rm -f nodejs-building'
+               }     
+            }
          }
       }
    }
