@@ -33,7 +33,7 @@ pipeline {
             }
          }
          stages {
-            stage('tag and push image){
+            stage('tag and push image'){
                steps {
                   sh 'docker commit nodejs-building nodejs-building'
                   sh 'docker tag $(docker images nodejs-building -qa) mayquanxi/nodejs'
