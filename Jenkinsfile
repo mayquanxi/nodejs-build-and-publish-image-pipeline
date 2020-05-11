@@ -1,12 +1,15 @@
 pipeline {
+   agent none
+   triggers {
+      pollSCM('*/2 * * * *')
+   }
+   stages {
+      stage('Build image in Sequential') {
         agent {
-              docker {
-                    image 'node:13'
-                    args '-p 3000:3000'
-              }
-        }
-        triggers {
-              pollSCM('*/2 * * * *')
+          docker {
+            image 'node:13'
+            args '-d -p 3000:3000 --name nodejs-building'
+          }
         }
         stages {
               stage('build') {
@@ -22,4 +25,22 @@ pipeline {
                     }     
               }
         }
-}
+      }
+      stage('Push image') {
+         agent {
+            node {
+               label 'master'
+            }
+         }
+         stages {
+            stage('tag and push image){
+               steps {
+                  sh 'docker commit nodejs-building nodejs-building'
+                  sh 'docker tag $(docker images nodejs-building -qa) mayquanxi/nodejs'
+                  sh 'docker push mayquanxi/nodejs'
+               }
+            }
+         }
+      }
+   }
+} 
